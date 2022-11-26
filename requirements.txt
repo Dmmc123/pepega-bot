@@ -1,0 +1,6 @@
+python-telegram-bot>=0.20.0.dev0
+pymongo
+pynndescent
+openai
+sentence-transformers
+transformers

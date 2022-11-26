@@ -1,0 +1,22 @@
+x-db-creds: &database-credentials
+  MONGO_INITDB_ROOT_USERNAME: "${db_login}"
+  MONGO_INITDB_ROOT_PASSWORD: "${db_pass}"
+  MONGO_INITDB_DATABASE: "${db_name}"
+
+services:
+  backend:
+    image: pepega
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      target: python
+    environment:
+      <<: *database-credentials
+      bot-api-token: "${bot_api_token}"
+      openai-api-token: "${openai_api_token}"
+      db-collection: tokens
+  db:
+    image: mongo
+    restart: always
+    environment:
+      <<: *database-credentials

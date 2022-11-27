@@ -9,12 +9,12 @@ import json
 
 class AnswerGenerator:
     def __init__(
-            self,
-            model_name="sentence-transformers/all-MiniLM-L6-v2",
-            index_path="index.pkl",
-            paragraphs_path="paragraphs.json",
-            tokenizer_name="gpt2",
-            completion_model="text-davinci-002"
+        self,
+        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        index_path="index.pkl",
+        paragraphs_path="paragraphs.json",
+        tokenizer_name="gpt2",
+        completion_model="text-davinci-002",
     ):
         # initializing the paragraph/question encoder and tokenizer
         self.encoder = SentenceTransformer(model_name)
@@ -27,16 +27,15 @@ class AnswerGenerator:
         with open(paragraphs_path) as f:
             self.paragraphs = json.load(f)
         # storing info prompt construction
-        self.prompt_params = {
-            "max_section_len": 500,
-            "sep": "\n* "
-        }
-        self.prompt_params["sep_len"] = len(self.tokenizer.tokenize(self.prompt_params["sep"]))
+        self.prompt_params = {"max_section_len": 500, "sep": "\n* "}
+        self.prompt_params["sep_len"] = len(
+            self.tokenizer.tokenize(self.prompt_params["sep"])
+        )
         # parameters for querying the gpt
         self.gpt_params = {
             "temperature": 0.0,
             "max_tokens": 300,
-            "model": completion_model
+            "model": completion_model,
         }
 
     def _prepare_prompt(self, question):
@@ -50,11 +49,15 @@ class AnswerGenerator:
         for section_index in most_relevant_document_sections:
             paragraph = self.paragraphs[section_index]
             # update current length
-            chosen_sections_len += len(self.tokenizer(paragraph)) + self.prompt_params["sep_len"]
+            chosen_sections_len += (
+                len(self.tokenizer(paragraph)) + self.prompt_params["sep_len"]
+            )
             if chosen_sections_len > self.prompt_params["max_section_len"]:
                 break
             # add section to prompt context
-            chosen_sections.append(self.prompt_params["sep"] + paragraph.replace("\n", " "))
+            chosen_sections.append(
+                self.prompt_params["sep"] + paragraph.replace("\n", " ")
+            )
         header = """Answer the question as truthfully as possible using the provided context, and if the answer is not contained within the text below, say "I don't know."\n\nContext:\n"""
         return header + "".join(chosen_sections) + "\n\n Q: " + question + "\n A:"
 
